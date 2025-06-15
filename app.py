@@ -1,4 +1,3 @@
-%%writefile pph_app_final.py
 import streamlit as st
 
 # Page setup
