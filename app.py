@@ -17,8 +17,6 @@ st.markdown(
 
     .stApp {
         background-color: #ffe4e1;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath fill='%23ff9999' d='M50,0 Q60,20 80,10 Q90,30 100,20 V100 H0 V20 Q10,30 20,10 Q40,20 50,0 Z'/%3E%3C/svg%3E");
-        background-size: 100px 100px;
     }
 
     h1 {
@@ -174,6 +172,7 @@ with st.form("pph_form"):
             file_name=f"{name}_PPH_Report.csv",
             mime='text/csv'
         )
+
 
 
 
