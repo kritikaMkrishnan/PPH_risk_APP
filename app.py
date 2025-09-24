@@ -17,7 +17,7 @@ st.markdown(
         font-family: 'Segoe UI', sans-serif;
     }
     h1, h4 {
-        color: #8B0000;
+        color: #000000;
     }
     </style>
     """,
@@ -149,4 +149,5 @@ if submitted:
         file_name=f"{name}_PPH_Report.csv",
         mime='text/csv'
     )
+
 
