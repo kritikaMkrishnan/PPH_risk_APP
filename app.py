@@ -5,26 +5,51 @@ from datetime import datetime
 # Page setup
 st.set_page_config(page_title="PPH Risk Detection App 💗", page_icon="💓", layout="centered")
 
-# Background style
+# Custom font and color styling
 st.markdown(
     """
     <style>
-    .stApp {
-        background-color: #ffe6f0;
-        background-image: url("https://cdn.pixabay.com/photo/2017/01/31/14/32/heart-2029949_1280.png");
-        background-repeat: repeat;
-        background-size: 80px;
-        font-family: 'Segoe UI', sans-serif;
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+    html, body, [class*="st-"] {
+        font-family: 'Inter', sans-serif;
     }
-    h1, h4 {
-        color: #000000;
+
+    .stApp {
+        background-color: #ffe4e1;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath fill='%23ff9999' d='M50,0 Q60,20 80,10 Q90,30 100,20 V100 H0 V20 Q10,30 20,10 Q40,20 50,0 Z'/%3E%3C/svg%3E");
+        background-size: 100px 100px;
+    }
+
+    h1 {
+        color: #000000; /* Black for high contrast */
+        font-weight: 700;
+    }
+
+    h4 {
+        color: #333333; /* Dark gray for a softer subtitle */
+        font-weight: 400;
+    }
+
+    .css-1v0mbdj p {
+        font-size: 16px;
+        color: #333333; /* Dark gray for body text */
+    }
+    
+    .stButton>button {
+        background-color: #ff6699;
+        color: white;
+        font-weight: bold;
+        border-radius: 12px;
+        border: none;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
     }
     </style>
     """,
     unsafe_allow_html=True
 )
 
-# Title
+# Title and subtitle
 st.markdown("<h1 style='text-align: center;'>💗 PPH Risk Detection App</h1>", unsafe_allow_html=True)
 st.markdown("<h4 style='text-align: center;'>Helping rural nurses and pregnant women assess risk easily</h4>", unsafe_allow_html=True)
 
@@ -57,97 +82,98 @@ with st.form("pph_form"):
 
     submitted = st.form_submit_button("💖 Check PPH Risk")
 
-def calculate_risk(params):
-    risk_score = 0
-    notes = []
+    if submitted:
+        inputs = {
+            'bleeding': bleeding.strip() or None,
+            'systolic': systolic_bp.strip() or None,
+            'diastolic': diastolic_bp.strip() or None,
+            'heart_rate': heart_rate.strip() or None,
+            'spo2': spo2.strip() or None,
+            'hemoglobin': hemoglobin.strip() or None,
+            'age': age.strip() or None,
+            'pod': pod.strip() or None
+        }
 
-    if params['bleeding'] and float(params['bleeding']) > 1000:
-        risk_score += 2
-        notes.append("🔴 Excessive blood loss")
+        def calculate_risk(params):
+            risk_score = 0
+            notes = []
 
-    if params['systolic'] and float(params['systolic']) < 90:
-        risk_score += 1
-        notes.append("⚠️ Low systolic BP")
+            if params['bleeding'] and float(params['bleeding']) > 1000:
+                risk_score += 2
+                notes.append("🔴 Excessive blood loss")
 
-    if params['diastolic'] and float(params['diastolic']) < 60:
-        risk_score += 1
-        notes.append("⚠️ Low diastolic BP")
+            if params['systolic'] and float(params['systolic']) < 90:
+                risk_score += 1
+                notes.append("⚠️ Low systolic BP")
 
-    if params['heart_rate'] and float(params['heart_rate']) > 100:
-        risk_score += 1
-        notes.append("⚠️ High heart rate")
+            if params['diastolic'] and float(params['diastolic']) < 60:
+                risk_score += 1
+                notes.append("⚠️ Low diastolic BP")
 
-    if params['spo2'] and float(params['spo2']) < 92:
-        risk_score += 1
-        notes.append("⚠️ Low SpO₂")
+            if params['heart_rate'] and float(params['heart_rate']) > 100:
+                risk_score += 1
+                notes.append("⚠️ High heart rate")
 
-    if params['hemoglobin'] and float(params['hemoglobin']) < 10:
-        risk_score += 1
-        notes.append("⚠️ Low hemoglobin")
+            if params['spo2'] and float(params['spo2']) < 92:
+                risk_score += 1
+                notes.append("⚠️ Low SpO₂")
 
-    if params['age']:
-        age_val = float(params['age'])
-        if age_val < 18 or age_val > 35:
-            risk_score += 1
-            notes.append("⚠️ Risk due to age")
+            if params['hemoglobin'] and float(params['hemoglobin']) < 10:
+                risk_score += 1
+                notes.append("⚠️ Low hemoglobin")
 
-    if params['pod'] and int(params['pod']) <= 3:
-        risk_score += 1
-        notes.append("⚠️ Early postpartum days")
+            if params['age']:
+                age_val = float(params['age'])
+                if age_val < 18 or age_val > 35:
+                    risk_score += 1
+                    notes.append("⚠️ Risk due to age")
 
-    if risk_score >= 4:
-        return "🔴 HIGH RISK: Please visit hospital urgently.", notes
-    elif risk_score == 3:
-        return "🟠 MODERATE RISK: Monitor closely and consult doctor.", notes
-    else:
-        return "🟢 LOW RISK: No immediate danger, keep observing.", notes
+            if params['pod'] and int(params['pod']) <= 3:
+                risk_score += 1
+                notes.append("⚠️ Early postpartum days")
 
-if submitted:
-    inputs = {
-        'bleeding': bleeding.strip() or None,
-        'systolic': systolic_bp.strip() or None,
-        'diastolic': diastolic_bp.strip() or None,
-        'heart_rate': heart_rate.strip() or None,
-        'spo2': spo2.strip() or None,
-        'hemoglobin': hemoglobin.strip() or None,
-        'age': age.strip() or None,
-        'pod': pod.strip() or None
-    }
+            if risk_score >= 4:
+                return "🔴 HIGH RISK: Please visit hospital urgently.", notes
+            elif risk_score == 3:
+                return "🟠 MODERATE RISK: Monitor closely and consult a doctor.", notes
+            else:
+                return "🟢 LOW RISK: No immediate danger, keep observing.", notes
 
-    result, reasons = calculate_risk(inputs)
+        result, reasons = calculate_risk(inputs)
 
-    st.subheader("💡 Result")
-    st.markdown(f"**{result}**")
-    if reasons:
-        st.markdown("#### Reasoning:")
-        for r in reasons:
-            st.markdown(r)
+        st.subheader("💡 Result")
+        st.markdown(f"**{result}**")
+        if reasons:
+            st.markdown("#### Reasoning:")
+            for r in reasons:
+                st.markdown(r)
 
-    # Collect data for download
-    data = {
-        "Name": [name],
-        "Reg No": [reg_no],
-        "Date": [datetime.now().strftime("%Y-%m-%d %H:%M")],
-        "Blood Loss (mL)": [bleeding],
-        "Systolic BP": [systolic_bp],
-        "Diastolic BP": [diastolic_bp],
-        "Heart Rate": [heart_rate],
-        "SpO2": [spo2],
-        "Hemoglobin": [hemoglobin],
-        "Age": [age],
-        "POD": [pod],
-        "Risk Level": [result]
-    }
+        # Collect data for download
+        data = {
+            "Name": [name],
+            "Reg No": [reg_no],
+            "Date": [datetime.now().strftime("%Y-%m-%d %H:%M")],
+            "Blood Loss (mL)": [bleeding],
+            "Systolic BP": [systolic_bp],
+            "Diastolic BP": [diastolic_bp],
+            "Heart Rate": [heart_rate],
+            "SpO2": [spo2],
+            "Hemoglobin": [hemoglobin],
+            "Age": [age],
+            "POD": [pod],
+            "Risk Level": [result]
+        }
 
-    df = pd.DataFrame(data)
+        df = pd.DataFrame(data)
 
-    # Download CSV
-    st.markdown("### 📥 Download Report")
-    st.download_button(
-        label="Download Report as CSV",
-        data=df.to_csv(index=False).encode('utf-8'),
-        file_name=f"{name}_PPH_Report.csv",
-        mime='text/csv'
-    )
+        # Download CSV
+        st.markdown("### 📥 Download Report")
+        st.download_button(
+            label="Download Report as CSV",
+            data=df.to_csv(index=False).encode('utf-8'),
+            file_name=f"{name}_PPH_Report.csv",
+            mime='text/csv'
+        )
+
 
 
